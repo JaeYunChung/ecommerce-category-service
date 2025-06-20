@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: category-service
+  cloud:
+    function:
+      definition: receiveOrderInfo
+    stream:
+      bindings:
+        receiveOrderInfo-in-0:
+          destination: my-topic
+          group: my-group
+      kafka:
+        binder:
+          brokers: localhost:9092
