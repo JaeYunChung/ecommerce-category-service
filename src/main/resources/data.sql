@@ -1,1 +1,2 @@
-insert into Product (id, productName, productCode, stock) values (1L, '컴퓨터', 'code', 10);
+
+insert into product (id, product_name, product_code, stock) values (1, '컴퓨터', 'code', 10);

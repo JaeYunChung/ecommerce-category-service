@@ -12,3 +12,16 @@ spring:
       kafka:
         binder:
           brokers: localhost:9092
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/category-db
+    username: root
+    password: 1234
+  sql:
+    init:
+      mode: always               # Spring Boot 2.5 이상에서 사용
+      data-locations: classpath:data.sql
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.MySQLDialect

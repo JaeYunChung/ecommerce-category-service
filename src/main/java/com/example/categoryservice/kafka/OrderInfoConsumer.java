@@ -21,11 +21,12 @@ public class OrderInfoConsumer {
     @Bean
     public Consumer<OrderInfoDto> receiveOrderInfo(){
         return dto -> {
-            productService.updateStockByOrder(dto);
             Optional<Product> product = productService.findProductByCode(dto.productCode());
             if (product.isEmpty()) throw new IllegalArgumentException("해당 재고가 없습니다.");
-            Product p = product.get();
-            log.info("{}의 남은 재고가 {} 남았습니다.", p.getProductName(), p.getStock());
+            log.info("현재 남아있는 재고 : {}", product.get().getStock());
+            productService.updateStockByOrder(dto);
+            product = productService.findProductByCode(dto.productCode());
+            log.info("업데이트 후 남아있는 재고 : {}", product.get().getStock());
         };
     }
 }
