@@ -1,18 +1,33 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: category-service-ingress
+  name: service-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
+          - path: /customer(/|$)(.*)
+            backend:
+              service:
+                name: customer-service
+                port:
+                  number: 80
+            pathType: ImplementationSpecific
           - path: /category(/|$)(.*)
             backend:
               service:
                 name: category-service
                 port:
                   number: 80
-            pathType: Prefix
+            pathType: ImplementationSpecific
+          - path: /order(/|$)(.*)
+            backend:
+              service:
+                name: order-service
+                port:
+                  number: 80
+            pathType: ImplementationSpecific
