@@ -3,9 +3,7 @@ package com.example.categoryservice.service;
 import com.example.categoryservice.domain.Product;
 import com.example.categoryservice.dto.CartOrderInfoDto;
 import com.example.categoryservice.dto.SingleOrderInfoDto;
-import com.example.categoryservice.exception.LackStockException;
 import com.example.categoryservice.repository.ProductRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -13,9 +11,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class ProductService {
     public void updateStockByOrder(String productCode, int qty){
         productRepository.updateStockByOrder(qty, productCode);
     }
-    @Transactional
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     public Optional<Product> findProductByCode(String productCode){
          return productRepository.findByProductCode(productCode);
     }
@@ -38,14 +38,18 @@ public class ProductService {
         Product product = findProductByCode(productCode).orElseThrow(
                 ()-> new IllegalArgumentException("해당 재고가 없습니다.")
         );
-        log.info("현재 남아있는 재고: ;{}", product.getStock());
+        boolean flag = true;
+        log.info("현재 남아있는 재고: {}", product.getStock());
         if (product.getStock()-qty <0){
             if (dto != null){
                 sendExceptionAlarmForRollback(dto);
             }
-            throw new LackStockException("남은 재고가 없습니다.");
+            flag=false;
         }
-        updateStockByOrder(productCode, qty);
+        if (flag) {
+            updateStockByOrder(productCode, qty);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
         product = findProductByCode(productCode).get();
         log.info("업데이트 후 남아있는 재고 : {}", product.getStock());
     }
