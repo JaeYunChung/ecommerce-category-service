@@ -7,11 +7,15 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Query("update Product p set p.stock=p.stock-:qty where p.productCode=:productCode")
-    void updateStockByOrder(int qty, String productCode);
+    void updateStock(int qty, String productCode);
 
     Optional<Product> findByProductCode(String productCode);
+
+    @Query("select sum(price) from Product where productCode in :productSet")
+    long getTotalPriceByCode(Set<String> productSet);
 }

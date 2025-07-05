@@ -14,4 +14,5 @@ public class Product {
     @Column(unique = true)
     private String productCode;
     private Long stock;
+    private Long price;
 }

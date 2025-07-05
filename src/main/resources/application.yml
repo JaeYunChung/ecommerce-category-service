@@ -3,14 +3,11 @@ spring:
     name: ecommerce-category-service
   cloud:
     function:
-      definition: receiveCartOrderInfo
+      definition: receiveOrderInfo
     stream:
       bindings:
         receiveCartOrderInfo-in-0:
-          destination: cart-order-topic
-          group: my-group
-        receiveSingleOrderInfo-in-0:
-          destination: single-order-topic
+          destination: output-order-topic
           group: my-group
       kafka:
         binder:
